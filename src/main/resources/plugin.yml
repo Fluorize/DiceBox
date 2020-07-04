@@ -1,0 +1,14 @@
+name: DiceBox
+version: ${project.version}
+main: com.gmail.supergame314.dicebox.DiceBox
+author: Super__Game
+commands:
+  dice:
+    description: Throw dice
+    usage: /<command>
+    permission: dicebox.throwdice
+permissions:
+  dicebox.throwdice:
+    default: true
+  dicebox.startD:
+    default: op
