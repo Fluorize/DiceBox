@@ -35,9 +35,9 @@ public final class DiceBox extends JavaPlugin implements Listener {
                         if (xdNumbers.get(me - 1) != null)
                             Bukkit.broadcastMessage(prefix + "§e§l§n" + xdNumbers.get(me - 1).getName() + "§5§l§nはピッタリで当てました！！ｷﾀ――(ﾟ∀ﾟ)――!!");
                         if (xdNumbers.size() != me && xdNumbers.get(me) != null)
-                            Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me - 1).getName() + "§2§lは1多い誤差で当てました！！");
+                            Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me).getName() + "§2§lは1多い誤差で当てました！！");
                         if (me >= 2 && xdNumbers.get(me - 2) != null)
-                            Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me - 1).getName() + "§2§lは1少ない誤差で当てました！！");
+                            Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me - 2).getName() + "§2§lは1少ない誤差で当てました！！");
                         doingD = null;
                         return true;
                     }
