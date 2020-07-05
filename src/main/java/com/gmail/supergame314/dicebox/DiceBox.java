@@ -10,6 +10,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -32,12 +33,20 @@ public final class DiceBox extends JavaPlugin implements Listener {
                         //D throw
                         int me = throwDice(maxD);
                         Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + (maxD) + "§3§l面ダイスを振って§e§l" + me + "§3§lがでた");
-                        if (xdNumbers.get(me - 1) != null)
+                        boolean b=false;
+                        if (xdNumbers.get(me - 1) != null) {
                             Bukkit.broadcastMessage(prefix + "§e§l§n" + xdNumbers.get(me - 1).getName() + "§5§l§nはピッタリで当てました！！ｷﾀ――(ﾟ∀ﾟ)――!!");
-                        if (xdNumbers.size() != me && xdNumbers.get(me) != null)
+                            b=true;
+                        }
+                        if (xdNumbers.size() != me && xdNumbers.get(me) != null) {
                             Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me).getName() + "§2§lは1多い誤差で当てました！！");
-                        if (me >= 2 && xdNumbers.get(me - 2) != null)
+                            b=true;
+                        }
+                        if (me >= 2 && xdNumbers.get(me - 2) != null) {
                             Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me - 2).getName() + "§2§lは1少ない誤差で当てました！！");
+                            b=true;
+                        }
+                        if(!b)sender.sendMessage(prefix+"§7§l当選者はいませんでした。");
                         doingD = null;
                         return true;
                     }
@@ -46,8 +55,10 @@ public final class DiceBox extends JavaPlugin implements Listener {
                     //
                     sender.sendMessage(prefix + "§c§lダイスを振ります");
                     sender.sendMessage(prefix + "§c/dice 面数");
-                    if (sender.isOp())
+                    if (sender.isOp()) {
                         sender.sendMessage(prefix + "§c/dice 面数D でDを始めることができます。");
+                        sender.sendMessage(prefix + "§c/dice dlist でDの番号使用状況が見れます。 ");
+                    }
                     return true;
                 }
 
@@ -65,10 +76,32 @@ public final class DiceBox extends JavaPlugin implements Listener {
                     }
                     maxD = d;
                     Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§d§lによって§e§l" + args[0] + "§d§lが開催されました！！");
-                    sender.sendMessage(prefix + "§a/udiceでダイスを振ります。");
+                    sender.sendMessage(prefix + "§a/diceでダイスを振ります。");
                     return true;
                 }
 
+
+                if (args[0].equalsIgnoreCase("dlist") && sender.isPermissionSet("dicebox.startD")){
+                    if(doingD==null){
+                        sender.sendMessage(prefix+"§c§lDはただいま開催していません！");
+                    }
+                    if(doingD!=sender){
+                        sender.sendMessage(prefix+"§c§lこのコマンドはD開催者専用です！");
+                        return true;
+                    }
+                    int ii = 0;
+                    for (Player xdNumber : xdNumbers) {
+                        if (xdNumber != null) ii++;
+                    }
+                    sender.sendMessage(prefix+"§a§l数字利用率：§e§l"+((int)(((double)ii)/maxD*10000))/100.0+"% §7("+ii+"/"+maxD+")");
+                    ii = 0;
+                    Collection<? extends Player> ps = getServer().getOnlinePlayers();
+                    for (Player player : ps) {
+                        if (xdNumbers.contains(player)) ii++;
+                    }
+                    sender.sendMessage(prefix+"§a§l鯖民参加率：§e§l"+((int)(((double)ii)/ps.size()*10000))/100.0+"% §7("+ii+"/"+ps.size()+")");
+                    return true;
+                }
                 //throw Dice
                 int d =isLargerNumberThan0(args[0]);
                 Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを振って§e§l" + throwDice(d) + "§3§lがでた");
