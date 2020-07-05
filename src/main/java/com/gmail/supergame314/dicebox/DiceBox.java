@@ -23,59 +23,59 @@ public final class DiceBox extends JavaPlugin implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(command.getName().equalsIgnoreCase("dice")){
-            if(args.length == 0){
-                if(doingD == sender){
-                    int me = throwDice(maxD);
-                    Bukkit.broadcastMessage(prefix + "§e§l"+sender.getName()+"§3§lは§e§l" + (maxD) + "§3§l面ダイスを振って§e§l" +me+"§3§lがでた");
-                    if(xdNumbers.get(me - 1) !=null)
-                        Bukkit.broadcastMessage(prefix + "§e§l§n"+ xdNumbers.get(me - 1).getName()+"§5§l§nはピッタリで当てました！！ｷﾀ――(ﾟ∀ﾟ)――!!");
-                    if(xdNumbers.size()!=me && xdNumbers.get(me) !=null)
-                        Bukkit.broadcastMessage(prefix + "§e§l"+ xdNumbers.get(me - 1).getName()+"§2§lは1多い誤差で当てました！！");
-                    if(me>=2 && xdNumbers.get(me - 2) !=null)
-                        Bukkit.broadcastMessage(prefix + "§e§l"+ xdNumbers.get(me - 1).getName()+"§2§lは1少ない誤差で当てました！！");
-                    doingD = null;
+        try {
+            if (command.getName().equalsIgnoreCase("dice")) {
+                if (args.length == 0) {
+
+
+                    if (doingD == sender) {
+                        //D throw
+                        int me = throwDice(maxD);
+                        Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + (maxD) + "§3§l面ダイスを振って§e§l" + me + "§3§lがでた");
+                        if (xdNumbers.get(me - 1) != null)
+                            Bukkit.broadcastMessage(prefix + "§e§l§n" + xdNumbers.get(me - 1).getName() + "§5§l§nはピッタリで当てました！！ｷﾀ――(ﾟ∀ﾟ)――!!");
+                        if (xdNumbers.size() != me && xdNumbers.get(me) != null)
+                            Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me - 1).getName() + "§2§lは1多い誤差で当てました！！");
+                        if (me >= 2 && xdNumbers.get(me - 2) != null)
+                            Bukkit.broadcastMessage(prefix + "§e§l" + xdNumbers.get(me - 1).getName() + "§2§lは1少ない誤差で当てました！！");
+                        doingD = null;
+                        return true;
+                    }
+
+
+                    //
+                    sender.sendMessage(prefix + "§c§lダイスを振ります");
+                    sender.sendMessage(prefix + "§c/dice 面数");
+                    if (sender.isOp())
+                        sender.sendMessage(prefix + "§c/dice 面数D でDを始めることができます。");
                     return true;
                 }
-                sender.sendMessage(prefix+"§c§lダイスを振ります");
-                sender.sendMessage(prefix+"§c/dice 面数");
-                if(sender.isOp())
-                    sender.sendMessage(prefix+"§c/dice 面数D でDを始めることができます。");
-                return true;
-            }
-            if(args[0].charAt(args[0].length()-1) == 'D' && sender.isPermissionSet("dicebox.startD")) {
-                if(doingD != null){
-                    sender.sendMessage(prefix+"§cただいまDは開催中です！！");
+
+                if (args[0].charAt(args[0].length() - 1) == 'D' && sender.isPermissionSet("dicebox.startD")) {
+                    //start D
+                    if (doingD != null) {
+                        sender.sendMessage(prefix + "§cただいまDは開催中です！！");
+                        return true;
+                    }
+                    int d = isLargerNumberThan0(args[0].substring(0, args[0].length() - 1));
+                    doingD = sender;
+                    xdNumbers = new ArrayList<>();
+                    while (xdNumbers.size() != d) {
+                        xdNumbers.add(null);
+                    }
+                    maxD = d;
+                    Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§d§lによって§e§l" + args[0] + "§d§lが開催されました！！");
+                    sender.sendMessage(prefix + "§a/udiceでダイスを振ります。");
                     return true;
                 }
-                if(!isNum(args[0].substring(0,args[0].length()-1))) {
-                    sender.sendMessage(prefix + "§c最大面数には数値を入力してください！");
-                    return true;
-                }
-                int d = Integer.parseInt(args[0].substring(0,args[0].length()-1));
-                if(d<=0){
-                    sender.sendMessage(prefix + "§c最大面数には１以上の数値を入力してください！");
-                    return true;
-                }
-                doingD = sender;
-                xdNumbers = new ArrayList<>();
-                while(xdNumbers.size()!=d){
-                    xdNumbers.add(null);
-                }
-                maxD=d;
-                Bukkit.broadcastMessage(prefix+"§e§l"+sender.getName()+"§d§lによって§e§l"+args[0]+"§d§lが開催されました！！");
-                sender.sendMessage(prefix+"§a/udiceでダイスを振ります。");
-                return true;
+
+                //throw Dice
+                int d =isLargerNumberThan0(args[0]);
+                Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを振って§e§l" + throwDice(d) + "§3§lがでた");
             }
-            if(!isNum(args[0])) {
-                sender.sendMessage(prefix+"§c最大面数には数値を入力してください！");
-                return true;
-            }
-            if(Integer.parseInt(args[0])<=0){
-                sender.sendMessage(prefix + "§c最大面数には１以上の数値を入力してください！");
-                return true;
-            }
-            Bukkit.broadcastMessage(prefix + "§e§l"+sender.getName()+"§3§lは§e§l" + args[0] + "§3§l面ダイスを振って§e§l" + throwDice(Integer.parseInt(args[0])) +"§3§lがでた");
+        } catch (NumberException e) {
+            sender.sendMessage(e.message);
+            return true;
         }
         return true;
     }
@@ -126,9 +126,29 @@ public final class DiceBox extends JavaPlugin implements Listener {
         return true;
     }
 
-    
+
+    int isLargerNumberThan0(String s) throws NumberException{
+        if(!isNum(s)){
+            throw new NumberException(prefix + "§c数値を入力してください！");
+        }
+        int i = Integer.parseInt(s);
+        if(i<1){
+            throw new NumberException(prefix + "§c１以上の数値を選択してください！");
+        }
+        return i;
+    }
+
     //1~max
     int throwDice(int max){
         return new Random().nextInt(max)+1;
     }
+}
+
+class NumberException extends Exception{
+    String message;
+
+    public NumberException(String message){
+        this.message = message;
+    }
+
 }
