@@ -84,6 +84,7 @@ public final class DiceBox extends JavaPlugin implements Listener {
                 if (args[0].equalsIgnoreCase("dlist") && sender.isPermissionSet("dicebox.startD")){
                     if(doingD==null){
                         sender.sendMessage(prefix+"§c§lDはただいま開催していません！");
+                        return true;
                     }
                     if(doingD!=sender){
                         sender.sendMessage(prefix+"§c§lこのコマンドはD開催者専用です！");
