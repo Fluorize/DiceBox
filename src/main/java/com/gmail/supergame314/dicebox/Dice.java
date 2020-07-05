@@ -24,5 +24,4 @@ public class Dice {
     public int goThrow(){
         return rnd.nextInt(max)+1;
     }
-
 }
