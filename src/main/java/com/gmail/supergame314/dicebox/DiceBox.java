@@ -115,8 +115,8 @@ public final class DiceBox extends JavaPlugin implements Listener {
                     tt+=ii;
                 }
                 s=s.substring(0,s.length()-1);
-                if(t<10)Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを§e§l"+(t==1?"§3§l":t+"§3§l個")+"振って§e§l" +s+(t!=1?"§6§l(TOTAL:"+tt:")")+ "§3§lがでた");
-                else sender.sendMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを§e§l" + (t + "§3§l個") + "振って§e§l" + s + "§3§lがでた (PRIVATE)");
+                if(t<10)Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを§e§l"+(t==1?"§3§l":t+"§3§l個")+"振って§e§l" +s+(t!=1?"§6§l(TOTAL:"+tt+")":"")+ "§3§lがでた");
+                else sender.sendMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを§e§l" + (t + "§3§l個") + "振って§e§l" + s+"§6§l(TOTAL:"+tt+")" + "§3§lがでた (PRIVATE)");
             }
         } catch (NumberException e) {
             sender.sendMessage(e.message);
