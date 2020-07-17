@@ -1,18 +1,18 @@
 package com.gmail.supergame314.dicebox;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 public final class DiceBox extends JavaPlugin implements Listener {
@@ -27,7 +27,6 @@ public final class DiceBox extends JavaPlugin implements Listener {
         try {
             if (command.getName().equalsIgnoreCase("dice")) {
                 if (args.length == 0) {
-
 
                     if (doingD == sender) {
                         //D throw
@@ -106,15 +105,15 @@ public final class DiceBox extends JavaPlugin implements Listener {
                 }
                 //throw Dice
                 int d = isLargerNumberThan0(args[0]);
-                String s = "";
+                StringBuilder s = new StringBuilder();
                 int t=(args.length ==1?1:isLargerNumberThan0(args[1]));
                 int tt=0;
                 for (int i=0;i<t;i++) {
                     int ii=throwDice(d);
-                    s += ii+",";
+                    s.append(ii).append(",");
                     tt+=ii;
                 }
-                s=s.substring(0,s.length()-1);
+                s = new StringBuilder(s.substring(0, s.length() - 1));
                 if(t<10)Bukkit.broadcastMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを§e§l"+(t==1?"§3§l":t+"§3§l個")+"振って§e§l" +s+(t!=1?"§6§l(TOTAL:"+tt+")":"")+ "§3§lがでた");
                 else sender.sendMessage(prefix + "§e§l" + sender.getName() + "§3§lは§e§l" + args[0] + "§3§l面ダイスを§e§l" + (t + "§3§l個") + "振って§e§l" + s+"§6§l(TOTAL:"+tt+")" + "§3§lがでた (PRIVATE)");
             }
@@ -125,7 +124,7 @@ public final class DiceBox extends JavaPlugin implements Listener {
         return true;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void dChat(AsyncPlayerChatEvent ev){
         if(doingD==null)
             return;
@@ -160,6 +159,23 @@ public final class DiceBox extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if(!command.getName().equals("dice"))
+            return super.onTabComplete(sender, command, alias, args);
+        List<String> rtn=new ArrayList<>();
+        if(args[0].equals("")){
+            rtn.addAll(Arrays.asList("1","2","3","4","5","6","7","8","9"));
+            if(sender.isPermissionSet("dicebox.startD")) rtn.add(0,args[0]+"dlist");
+        }
+        if(isNum(args[0])){
+            rtn.addAll(Arrays.asList(args[0]+"0",args[0]+"1",args[0]+"2",args[0]+"3",args[0]+"4",args[0]+"5",args[0]+"6",args[0]+"7",args[0]+"8",args[0]+"9"));
+            if(sender.isPermissionSet("dicebox.startD")) rtn.add(0,args[0]+"D");
+        }
+        if(sender.isPermissionSet("dicebox.startD") && args[0].startsWith("dlist"))rtn=Collections.singletonList("dlist");
+        return rtn;
     }
 
     boolean isNum(String target){
