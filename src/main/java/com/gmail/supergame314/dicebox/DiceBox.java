@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,9 +19,36 @@ import java.util.*;
 public final class DiceBox extends JavaPlugin implements Listener {
 
     static final String prefix = "§l[§3§lDice§2§lBox§f§l]§r ";
+
+    /**
+     * doingD
+     *
+     * 運営Dの実行者を格納します
+     *
+     */
     static CommandSender doingD = null;
-    static int maxD;
+
+
+    /**
+     * xdNumbers
+     *
+     * (添字-1)番目の番号を誰が言ったのかを表しています
+     * 宣言時にnullを個数分入れているので(ex.81行目)IndexOutOfBoundsExceptionは出ないと思います
+     *
+     * なお、Listは0から始まるため、実際の数字から-1しています
+     *
+     */
+
     static List<Player> xdNumbers;
+
+    /**
+     * maxD
+     *
+     * 運営D時、最大値を格納します
+     * xdNumbersのsizeを見ればいいのですが、単純化したかった....
+     *
+     */
+    static int maxD;
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -49,16 +77,7 @@ public final class DiceBox extends JavaPlugin implements Listener {
                         doingD = null;
                         return true;
                     }
-
-
-                    //
-                    sender.sendMessage(prefix + "§c§lダイスを振ります");
-                    sender.sendMessage(prefix + "§c/dice <面数> [個数]");
-                    sender.sendMessage(prefix + "§7個数が10個以上だと公のチャットに公開されません");
-                    if (sender.isOp()) {
-                        sender.sendMessage(prefix + "§c/dice <面数>D でDを始めることができます。");
-                        sender.sendMessage(prefix + "§c/dice dlist でDの番号使用状況が見れます。 ");
-                    }
+                    showInfo(sender);
                     return true;
                 }
 
@@ -79,8 +98,6 @@ public final class DiceBox extends JavaPlugin implements Listener {
                     sender.sendMessage(prefix + "§a/diceでダイスを振ります。");
                     return true;
                 }
-
-
                 if (args[0].equalsIgnoreCase("dlist") && sender.isPermissionSet("dicebox.startD")) {
                     if (doingD == null) {
                         sender.sendMessage(prefix + "§c§lDはただいま開催していません！");
@@ -203,11 +220,32 @@ public final class DiceBox extends JavaPlugin implements Listener {
     int throwDice(int max){
         return new Random().nextInt(max)+1;
     }
+
+    private void showInfo(CommandSender sender){
+        sender.sendMessage(prefix + "§c§lダイスを振ります");
+        sender.sendMessage(prefix + "§c/dice <面数> [個数]");
+        sender.sendMessage(prefix + "§7個数が10個以上だと公のチャットに公開されません");
+        if (sender.isOp()) {
+            sender.sendMessage(prefix + "§c/dice <面数>D でDを始めることができます。");
+            sender.sendMessage(prefix + "§c/dice dlist でDの番号使用状況が見れます。 ");
+        }
+    }
 }
+
+/**
+ * NumberException
+ *
+ * なんか適当な例外ないかな、というわけで作ったのです。
+ * コマンドの引数の値が不正なとき投げられます
+ * catch文を使うと便利かなーって思って。
+ *
+ * @see DiceBox#onCommand(CommandSender, Command, String, String[])
+ *
+ */
+
 
 class NumberException extends Exception{
     String message;
-
     public NumberException(String message){
         this.message = message;
     }
